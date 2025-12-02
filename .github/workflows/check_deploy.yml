@@ -14,8 +14,8 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      ASP_PRODUCT_FEEDBACK__SERVER: ${{secrets.ASP_PRODUCT_FEEDBACK__SERVER}}
-      ASP_PRODUCT_FEEDBACK__CLIENT: ${{secrets.ASP_PRODUCT_FEEDBACK__CLIENT}}
+      ASP_INVOICES__SERVER: ${{secrets.ASP_INVOICES__SERVER}}
+      ASP_INVOICES__CLIENT: ${{secrets.ASP_INVOICES__CLIENT}}
       APP_NAME: ${{secrets.APP_NAME}}
       ENV_MODE: "test"
       BACK_URL: ${{secrets.BACK_URL}}
@@ -119,7 +119,7 @@ jobs:
         working-directory: apps/server
         run: flyctl deploy --remote-only --config fly.toml
         env:
-          FLY_API_TOKEN: ${{ secrets.ASP_PRODUCT_FEEDBACK__SERVER }}
+          FLY_API_TOKEN: ${{ secrets.ASP_INVOICES__SERVER }}
 
       - name: 💻 deploy client
         working-directory: apps/client
@@ -131,4 +131,4 @@ jobs:
             --build-arg FRONT_URL=${{ secrets.FRONT_URL }} \
             --build-arg BACK_URL=${{ secrets.BACK_URL }}
         env:
-          FLY_API_TOKEN: ${{ secrets.ASP_PRODUCT_FEEDBACK__CLIENT }}
+          FLY_API_TOKEN: ${{ secrets.ASP_INVOICES__CLIENT }}
