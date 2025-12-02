@@ -1,0 +1,67 @@
+package server.middleware.parsers.sub;
+
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+
+import server.decorators.types.Dict;
+import server.decorators.types.Nullable;
+import server.lib.data_structure.LibShape;
+
+@SuppressWarnings("unchecked")
+public class ParserManager {
+    protected static final Nullable<Dict> nestDict(String query) {
+        if (!LibShape.hasText(query))
+            return Nullable.asNone();
+
+        final Dict dict = new Dict();
+
+        for (final String pair : query.split("&")) {
+            final String[] kv = pair.split("=", 2);
+
+            if (kv.length < 2)
+                continue;
+
+            final String rawKey = URLDecoder.decode(kv[0], StandardCharsets.UTF_8);
+            final String rawVal = URLDecoder.decode(kv[1], StandardCharsets.UTF_8);
+
+            nestKeyVal(dict, rawKey, rawVal);
+        }
+
+        return Nullable.of(dict);
+    }
+
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
+    private static final void nestKeyVal(Dict dict, String key, Object val) {
+        final boolean isArrayKey = key.endsWith("[]");
+        final String[] parts = key.replace("]", "").split("\\[");
+
+        Dict curr = dict;
+        int lastIdx = isArrayKey ? parts.length - 2 : parts.length - 1;
+        if (lastIdx < 0)
+            lastIdx = 0;
+
+        for (int i = 0; i < lastIdx; i++) {
+            String p = parts[i];
+            Dict next = (Dict) curr.computeIfAbsent(p, k -> new Dict());
+            curr = next;
+        }
+
+        final String lastKey = parts[lastIdx];
+
+        addVal(curr, lastKey, isArrayKey, val);
+    }
+
+    private static final void addVal(Dict curr, String lastKey, boolean isArrayKey, Object val) {
+        final Object existingVal = curr.get(lastKey);
+
+        if (existingVal instanceof List)
+            ((List<Object>) existingVal).add(val);
+        else if (LibShape.isPresent(existingVal))
+            curr.put(lastKey, new ArrayList<>(List.of(existingVal, val)));
+        else
+            curr.put(lastKey, isArrayKey ? new ArrayList<>(List.of(val)) : val);
+
+    }
+}

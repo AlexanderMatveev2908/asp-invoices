@@ -1,0 +1,98 @@
+package server.middleware.base_mdw;
+
+import java.util.UUID;
+import java.util.function.Supplier;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
+import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebFilter;
+import org.springframework.web.server.WebFilterChain;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+
+import reactor.core.publisher.Mono;
+import server.decorators.core.ErrAPI;
+import server.decorators.core.api.Api;
+import server.decorators.types.Dict;
+import server.decorators.types.Nullable;
+import server.lib.data_structure.prs.LibPrs;
+import server.middleware.base_mdw.etc.services.FormChecker;
+import server.middleware.base_mdw.etc.services.RateLimitSvc;
+
+public abstract class BaseMdw implements WebFilter {
+
+    @Autowired
+    private RateLimitSvc rl;
+    @Autowired
+    private FormChecker formCk;
+
+    protected abstract Mono<Void> handle(Api api, WebFilterChain chain);
+
+    @Override
+    public final Mono<Void> filter(ServerWebExchange exc, WebFilterChain chain) {
+        final Api api = (Api) exc;
+        return handle(api, chain);
+    }
+
+    private final <T> Mono<Void> checkForm(Api api, T form) {
+        return formCk.check(api, form);
+    }
+
+    private final <T> Mono<T> convertAndCheckForm(Api api, Dict arg, Class<T> cls) {
+        final T form = LibPrs.tFromDict(arg, cls);
+        return checkForm(api, form).thenReturn(form);
+    }
+
+    private final Mono<Dict> grabBody(Api api) {
+        return api.getBd(new TypeReference<Dict>() {
+        }).switchIfEmpty(Mono.error(new ErrAPI("data not provided", 400)));
+    }
+
+    // ? rate limit
+    protected final Mono<Void> limit(Api api, int limit, int minutes) {
+        return rl.limit(api, limit, minutes);
+    }
+
+    // ? forms & data
+    protected final <T> Mono<T> checkBodyForm(Api api, Class<T> cls) {
+        return grabBody(api).flatMap(body -> convertAndCheckForm(api, body, cls));
+    }
+
+    protected final <T> Mono<T> checkMultipartForm(Api api, Class<T> cls) {
+        final Nullable<Dict> parsedFormData = api.getParsedForm();
+
+        return Mono.defer(() -> parsedFormData.isPresent() ? Mono.just(parsedFormData.orYell()) : grabBody(api))
+                .flatMap(mapArg -> convertAndCheckForm(api, mapArg, cls));
+    }
+
+    protected final <T> Mono<T> checkQueryForm(Api api, Class<T> cls) {
+        final Nullable<Dict> parsedQuery = api.getParsedQuery();
+
+        return Mono.defer(() -> !parsedQuery.isPresent() ? Mono.error(new ErrAPI("data not provided", 400))
+                : convertAndCheckForm(api, parsedQuery.orYell(), cls));
+    }
+
+    // ? path & variables path
+    protected final Mono<UUID> withPathId(Api api) {
+        if (!api.hasPathUUID())
+            return Mono.error(new ErrAPI("id missing or invalid", 400));
+
+        return Mono.just(api.getPathVarId().orYell());
+    }
+
+    protected final Mono<Void> isTarget(Api api, WebFilterChain chain, String path, HttpMethod method,
+            Supplier<Mono<Void>> cb) {
+        return !api.isSamePath("/api/v1" + path, method) ? chain.filter(api) : cb.get();
+    }
+
+    protected final Mono<Void> isSubPathOf(Api api, WebFilterChain chain, String p, Supplier<Mono<Void>> cb) {
+        return !api.isSubPathOf("/api/v1" + p) ? chain.filter(api) : cb.get();
+    }
+
+    protected final Mono<Void> matchPathAfterCutIdOut(Api api, WebFilterChain chain, String p, HttpMethod method,
+            Supplier<Mono<Void>> cb) {
+        return !api.matchPathAfterCutIdOut("/api/v1" + p, method) ? chain.filter(api) : cb.get();
+    }
+
+}

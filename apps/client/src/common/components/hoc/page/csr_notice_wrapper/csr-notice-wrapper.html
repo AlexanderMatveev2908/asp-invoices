@@ -1,0 +1,38 @@
+<app-page-wrapper [waitClient]="true">
+  <ng-template #contentRef>
+    <div class="root">
+      <div class="root__content" [style.--clr]="useMetaDir.cssVar()">
+        <div id="csr_notice__svg_wrap" class="content__svg_wrap">
+          <ng-container *ngComponentOutlet="useMetaDir.Svg()" />
+        </div>
+
+        <div id="csr_notice__content" class="content__body">
+          <div id="csr_notice__span_status" class="body__span">
+            @let dataStatus = props().status|| useMetaDir.eventT();
+            <span class="text-5xl sm:text-6xl font-extrabold">
+              {{ dataStatus }}
+            </span>
+          </div>
+
+          <div id="csr_notice__span_msg" class="body__span">
+            <span>{{ props().msg }}</span>
+          </div>
+
+          @if(props().tmpt === 'home'){ <ng-container *ngTemplateOutlet="footer" />}
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</app-page-wrapper>
+
+<ng-template #footer>
+  <div class="content__footer">
+    <app-link-shadow
+      [path]="'/'"
+      appUseSpanDir
+      [spanProps]="spanProps"
+      appUseMetaEventDir
+      [eventT]="useMetaDir.eventT()"
+    />
+  </div>
+</ng-template>

@@ -1,0 +1,23 @@
+package server.conf.env_vars.etc.data_structure;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import server.decorators.core.ErrAPI;
+
+@Getter
+@RequiredArgsConstructor
+public enum EnvModeT {
+    DEV("development"),
+    TEST("test"),
+    PROD("production");
+
+    private final String val;
+
+    public static final EnvModeT fromValue(String val) {
+        for (final EnvModeT mode : values())
+            if (mode.val.equalsIgnoreCase(val))
+                return mode;
+
+        throw new ErrAPI("Invalid mode => " + val);
+    }
+}

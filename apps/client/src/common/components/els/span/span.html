@@ -1,0 +1,24 @@
+<div class="root">
+  @let Svg = useSpanDir.spanProps().Svg;
+  <!--  -->
+  @if (Svg) {
+  <app-wrap-txt-api
+    [spinSizeT]="spinSize()"
+    appUseWrapApiDir
+    [isPending]="isPending()"
+    [eventT]="eventT()"
+  >
+    <div [class]="useSpanDir.spanSizesProps().svg">
+      <ng-container *ngComponentOutlet="Svg" />
+    </div>
+  </app-wrap-txt-api>
+  }
+  <!--  -->
+  @let label = useSpanDir.spanProps().label;
+  <!--  -->
+  @if(label){
+  <span [class]="useSpanDir.spanSizesProps().txt" [attr.data-testid]="'span_label'">{{
+    label
+  }}</span>
+  }
+</div>

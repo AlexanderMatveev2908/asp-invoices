@@ -1,0 +1,12 @@
+@use 'exports/mix.scss' as mix;
+
+:host {
+  @apply block w-full;
+}
+
+.root {
+  @apply border-2 bg-transparent;
+  @include mix.app__btn__res(var(--pad));
+  @include mix.el__shw(var(--clr));
+  @include mix.app__el__scl(1.15);
+}

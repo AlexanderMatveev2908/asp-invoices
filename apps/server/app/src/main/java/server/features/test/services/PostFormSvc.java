@@ -1,0 +1,72 @@
+package server.features.test.services;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.springframework.stereotype.Service;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
+import reactor.util.function.Tuples;
+import server.conf.cloud.CloudSvc;
+import server.conf.cloud.etc.data_structure.CloudAsset;
+import server.decorators.core.ErrAPI;
+import server.decorators.core.api.Api;
+import server.decorators.types.AppFile;
+import server.decorators.types.Dict;
+import server.decorators.types.Nullable;
+
+@Service
+@RequiredArgsConstructor
+@SuppressFBWarnings({ "EI2", "EI" })
+public class PostFormSvc {
+  private static final boolean deleteUploads = true;
+  private final CloudSvc cloud;
+
+  @SuppressWarnings("unchecked")
+  private final Mono<List<CloudAsset>> reduceUploads(Dict form) {
+    final Set<String> assetKeys = Set.of("images", "videos");
+    final List<Mono<CloudAsset>> promises = new ArrayList<>();
+
+    for (final Map.Entry<String, Object> pair : form.entrySet()) {
+      if (!assetKeys.contains(pair.getKey()))
+        continue;
+
+      final List<AppFile> arg = (List<AppFile>) pair.getValue();
+      for (final AppFile f : arg)
+        promises.add(cloud.upload(f).doFinally(sig -> f.deleteLocally()));
+    }
+
+    return Flux.merge(promises).collectList();
+  }
+
+  private final Mono<List<Integer>> reduceDeletions(List<CloudAsset> saved) {
+    return Flux.fromIterable(saved)
+        .flatMap(el -> cloud.delete(el.getPublicId(), el.getResourceType())).collectList();
+  }
+
+  public final Mono<Tuple2<Integer, Integer>> postForm(Api api) {
+    final Nullable<Dict> form = api.getParsedForm();
+
+    if (form.isNone())
+      return Mono.error(new ErrAPI("no form data", 400));
+
+    return reduceUploads(form.orYell())
+        .zipWhen(saved -> deleteUploads ? reduceDeletions(saved) : Mono.just(List.of(0)))
+        .map(tpl -> {
+          final List<CloudAsset> saved = tpl.getT1();
+          final List<Integer> deleted = tpl.getT2();
+
+          final int savedCount = saved.size();
+          final int deletedCount = deleted.stream().mapToInt(Integer::intValue).sum();
+
+          return Tuples.of(savedCount, deletedCount);
+        });
+  }
+
+}

@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: asp-invoices-server
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: asp-invoices-server
+  template:
+    metadata:
+      labels:
+        app: asp-invoices-server
+    spec:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: "kubernetes.io/hostname"
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: asp-invoices-server
+      containers:
+        - name: server
+          image: alexandermatveev2908/asp-invoices-server:latest
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - secretRef:
+                name: asp-invoices

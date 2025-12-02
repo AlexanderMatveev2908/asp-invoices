@@ -1,0 +1,54 @@
+@use './t.css';
+
+@use './tokens/twd_hex.scss';
+@use './tokens/app_clr.scss';
+@use './tokens/fonts.scss';
+@use './tokens/txt.scss';
+@use './tokens/SVGs.scss';
+@use './tokens/etc.scss';
+@use './tokens/animations.scss';
+
+// ? all files inside tokens are imported here
+// ! exports are never imported here
+// ! files inside exports are used inside components only
+
+* {
+  font-family: 'Jost', sans-serif;
+}
+
+:root {
+  --app__shadow: 0 10px 40px -7px rgba(55, 63, 104, 0.35);
+  top: calc(100% + 16px);
+}
+
+html {
+  @apply bg-neutral-950 text-white;
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply overflow-x-hidden;
+}
+
+input {
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+button {
+  &:enabled {
+    cursor: url('/images/pointer.png') 0 0, pointer;
+  }
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+a {
+  &:hover {
+    cursor: url('/images/pointer.png') 0 0, pointer;
+  }
+}

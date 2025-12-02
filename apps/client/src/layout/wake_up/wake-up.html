@@ -1,0 +1,13 @@
+<app-popup [staticProps]="popupStaticProps" [isPop]="usePopHk.isPop()" [allowClose]="false">
+  <ng-template #popContent>
+    <div class="root">
+      <div class="root__msg">
+        <span>Server at</span>
+        <span>{{ backURL }}</span>
+        <span>waking up... 💤</span>
+      </div>
+
+      <app-spin-btn appUseMetaEventDir [eventT]="'INFO'" />
+    </div>
+  </ng-template>
+</app-popup>

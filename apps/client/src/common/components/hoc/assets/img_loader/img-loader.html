@@ -1,0 +1,24 @@
+<div class="root" [style.--size]="size()" [style.--radius]="radius()">
+  @if(isPending() && !isError()) {
+  <div class="root__pending"></div>
+  }
+  <!--  -->
+  <img
+    [src]="src()"
+    alt="👻"
+    (load)="onLoaded()"
+    (error)="onError()"
+    [ngClass]="twdImg()"
+    class="root__content"
+  />
+  <!--  -->
+  @if(isError()){
+  <div class="root__error">
+    <div class="error__svg">
+      <ng-container *ngComponentOutlet="metaError.Svg" />
+    </div>
+
+    <span class="error__label">Error loading image</span>
+  </div>
+  }
+</div>
