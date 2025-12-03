@@ -1,16 +1,14 @@
 package server.models.users.etc;
 
-import java.util.UUID;
-
 import org.springframework.data.r2dbc.repository.Query;
-import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
 
 import reactor.core.publisher.Mono;
+import server.models.RootTableRepo;
 import server.models.users.User;
 
 @Repository
-public interface UserRepo extends ReactiveCrudRepository<User, UUID> {
+public interface UserRepo extends RootTableRepo<User> {
   @Query("""
       INSERT INTO users (name, username)
       VALUES (:#{#user.name}, :#{#user.username})

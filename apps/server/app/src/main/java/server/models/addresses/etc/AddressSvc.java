@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
-import reactor.core.publisher.Mono;
 import server.models.RootTableSvc;
 import server.models.addresses.Address;
 
@@ -18,7 +17,4 @@ public final class AddressSvc extends RootTableSvc<Address> {
     return addressRepo;
   }
 
-  public final Mono<Address> insert(Address address) {
-    return addressRepo.insert(address);
-  }
 }

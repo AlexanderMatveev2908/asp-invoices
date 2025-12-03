@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
-import reactor.core.publisher.Mono;
 import server.models.RootTableSvc;
 import server.models.invoices.Invoice;
 
@@ -16,10 +15,6 @@ public final class InvoiceSvc extends RootTableSvc<Invoice> {
 
   public final InvoiceRepo withRepo() {
     return invoiceRepo;
-  }
-
-  public final Mono<Invoice> insert(Invoice Invoice) {
-    return invoiceRepo.insert(Invoice);
   }
 
 }

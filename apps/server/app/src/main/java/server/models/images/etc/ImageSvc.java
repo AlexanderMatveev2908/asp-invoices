@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
-import reactor.core.publisher.Mono;
 import server.models.RootTableSvc;
 import server.models.images.Image;
 
@@ -18,7 +17,4 @@ public final class ImageSvc extends RootTableSvc<Image> {
     return imageRepo;
   }
 
-  public final Mono<Image> insert(Image image) {
-    return imageRepo.insert(image);
-  }
 }

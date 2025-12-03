@@ -18,10 +18,6 @@ public final class UserSvc extends RootTableSvc<User> {
     return userRepo;
   }
 
-  public final Mono<User> insert(User user) {
-    return userRepo.insert(user);
-  }
-
   public final Mono<User> byUsername(String arg) {
     return userRepo.byUsername(arg);
   }
