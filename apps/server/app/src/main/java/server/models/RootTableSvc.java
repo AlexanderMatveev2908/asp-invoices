@@ -12,15 +12,16 @@ import server.decorators.core.ErrAPI;
 @Service
 @SuppressFBWarnings({ "EI2", "EI" })
 @RequiredArgsConstructor
-public abstract class RootTableSvc<T> {
-  public abstract RootTableRepo<T> withRepo();
+public abstract class RootTableSvc<T, R extends RootTableRepo<T>> {
+
+  protected final R repo;
 
   public final Mono<T> insert(T arg) {
-    return withRepo().insert(arg);
+    return repo.insert(arg);
   }
 
   public final Mono<T> byId(UUID id) {
-    return withRepo().findById(id);
+    return repo.findById(id);
   }
 
   public final Mono<T> throwNotFound(UUID id, String nameNotFound) {
