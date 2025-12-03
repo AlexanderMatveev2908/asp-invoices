@@ -343,7 +343,6 @@ erDiagram
     string name
     integer qty
     float price
-    float total
   }
 ```
 
