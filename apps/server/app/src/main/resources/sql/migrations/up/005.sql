@@ -1,14 +1,3 @@
-DO $$
-BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'status_type') THEN
-        CREATE TYPE status_type AS ENUM (
-            'DRAFT',
-            'PENDING',
-            'PAID'
-          );
-    END IF;
-END$$;
-
 CREATE TABLE IF NOT EXISTS addresses (
   streets TEXT NOT NULL,
   city TEXT NOT NULL,

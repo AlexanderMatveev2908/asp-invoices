@@ -78,3 +78,19 @@ databaseChangeLog:
             relativeToChangelogFile: true
             splitStatements: false
             stripComments: true
+
+  - changeSet:
+      id: "006_invoices_table"
+      author: ninja
+      changes:
+        - sqlFile:
+            path: migrations/up/006.sql
+            relativeToChangelogFile: true
+            splitStatements: false
+            stripComments: true
+      rollback:
+        - sqlFile:
+            path: migrations/down/006.sql
+            relativeToChangelogFile: true
+            splitStatements: false
+            stripComments: true
