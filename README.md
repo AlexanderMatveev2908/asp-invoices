@@ -283,19 +283,19 @@ If you’ve set up the **Nginx reverse proxy** (see section above), it will auto
 
 ```mermaid
 erDiagram
- root_table ||--||users : extends
- root_table ||--||images : extends
- root_table ||--||invoices : extends
- root_table ||--||addresses : extends
+ root_table ||--|| users : extends
+ root_table ||--|| images : extends
+ root_table ||--|| invoices : extends
+ root_table ||--|| addresses : extends
+ root_table ||--|| items : extends
 
  invoices }o--|| status_type : uses
 
  users ||--|| images : has
  users ||--}o invoices : has
- invoices ||--}o addresses : has
  invoices ||--|| sender_address : has
  invoices ||--|| client_address : has
-
+ invoices ||--}| items : has
 
   root_table {
     uuid id
@@ -310,19 +310,19 @@ erDiagram
   }
 
   images {
+    uuid user_id
     string public_id
     string url
-    uuid user_id
   }
 
   invoices {
+    uuid sender_address_id
+    uuid client_address_id
     string description
     integer payment_term
     string client_name
     string client_email
     status_type status
-    uuid sender_address_id
-    uuid client_address_id
   }
 
   status_type {
@@ -336,6 +336,14 @@ erDiagram
     string city
     string post_code
     string country
+  }
+
+  items {
+    uuid invoice_id
+    string name
+    integer qty
+    float price
+    float total
   }
 ```
 
