@@ -5,7 +5,7 @@
 Full-Stack **Invoices** application created as learning project.
 The UI and layout are built following the official design from [Frontend Mentor](https://www.frontendmentor.io/).
 
-**Live** version available on [Fly.io]().
+**Live** version available on [Fly.io](https://asp-invoices-client.fly.dev/).
 
 ---
 
@@ -285,18 +285,16 @@ If you’ve set up the **Nginx reverse proxy** (see section above), it will auto
 erDiagram
  root_table ||--||users : extends
  root_table ||--||images : extends
- root_table ||--||feedbacks : extends
- root_table ||--||comments : extends
- root_table ||--||replies : extends
+ root_table ||--||invoices : extends
+ root_table ||--||addresses : extends
 
- feedbacks }o--|| category_type : uses
- feedbacks }o--|| status_type : uses
+ invoices }o--|| status_type : uses
 
  users ||--|| images : has
- feedbacks ||--}o comments : has
- users ||--}o comments : has
- users ||--}o replies : has
- comments ||--}o replies : has
+ users ||--}o invoices : has
+ invoices ||--}o addresses : has
+ invoices ||--|| sender_address : has
+ invoices ||--|| client_address : has
 
 
   root_table {
@@ -317,39 +315,27 @@ erDiagram
     uuid user_id
   }
 
-  category_type {
-    enum UI
-    enum UX
-    enum FEATURE
-    enum ENHANCEMENT
-    enum BUG
+  invoices {
+    string description
+    integer payment_term
+    string client_name
+    string client_email
+    status_type status
+    uuid sender_address_id
+    uuid client_address_id
   }
 
   status_type {
-    enum SUGGESTION
-    enum PLANNED
-    enum IN_PROGRESS
-    enum LIVE
+    enum DRAFT
+    enum PENDING
+    enum PAID
   }
 
-  feedbacks {
-    string title
-    string description
-    category_type category
-    status_type status
-  }
-
-  comments {
-    string content
-    uuid user_id
-    uuid feedback_id
-  }
-
-  replies {
-    string content
-    uuid user_id
-    uuid comment_id
-    uuid replying_to_id
+  addresses {
+    string street
+    string city
+    string post_code
+    string country
   }
 ```
 
@@ -358,32 +344,6 @@ erDiagram
 ## 🛠️ CI/CD
 
 The pipeline is defined in [`GitHub Workflows`](.github/workflows/check_deploy.yml) and runs automatically on every push to the **main** branch.
-
-### 🚧 Workflow Stages
-
-1. **Lint & Type Checking**
-
-   - Runs `yarn check` to validate both client and server code.
-
-2. **Tests**
-
-   - Run `yarn test` for both client and server to ensure code quality and prevent regression.
-
-3. **Deployment to Fly.io**
-
-   - Client and server are hosted separately, each with its own Dockerfile.
-   - **Server** is built and deployed first, ensuring it’s available for any API requests during client build.
-   - **Client** is then built and deployed. Static pages that rely on API data can safely query the newly deployed server.
-
----
-
-This way it:
-
-- Ensures **zero broken builds** reach production.
-- Keeps **frontend and backend deployments independent** but coordinated.
-- Automates the whole dev => deploy cycle with minimal manual intervention.
-
----
 
 ## ✏️ Final Notes
 
