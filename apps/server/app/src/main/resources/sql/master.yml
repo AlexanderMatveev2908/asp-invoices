@@ -94,3 +94,19 @@ databaseChangeLog:
             relativeToChangelogFile: true
             splitStatements: false
             stripComments: true
+
+  - changeSet:
+      id: "007_items_table"
+      author: ninja
+      changes:
+        - sqlFile:
+            path: migrations/up/007.sql
+            relativeToChangelogFile: true
+            splitStatements: false
+            stripComments: true
+      rollback:
+        - sqlFile:
+            path: migrations/down/007.sql
+            relativeToChangelogFile: true
+            splitStatements: false
+            stripComments: true
