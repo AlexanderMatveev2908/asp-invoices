@@ -2,8 +2,7 @@ CREATE TABLE IF NOT EXISTS items (
   invoice_id UUID NOT NULL REFERENCES invoices(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   qty INTEGER NOT NULL,
-  price FLOAT NOT NULL,
-  total FLOAT NOT NULL
+  price FLOAT NOT NULL
 ) INHERITS (root_table);
 
 ALTER TABLE items
