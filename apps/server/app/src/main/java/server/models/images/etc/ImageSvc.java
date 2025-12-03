@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
+import server.decorators.core.ErrAPI;
 import server.models.images.Image;
 
 @Service
@@ -21,5 +22,9 @@ public final class ImageSvc {
 
   public final Mono<Image> byId(UUID id) {
     return imageRepo.findById(id);
+  }
+
+  public final Mono<Image> throwNotFound(UUID id) {
+    return imageRepo.findById(id).switchIfEmpty(Mono.error(new ErrAPI("image not found", 404)));
   }
 }
