@@ -62,3 +62,19 @@ databaseChangeLog:
             relativeToChangelogFile: true
             splitStatements: false
             stripComments: true
+
+  - changeSet:
+      id: "005_addresses_table"
+      author: ninja
+      changes:
+        - sqlFile:
+            path: migrations/up/005.sql
+            relativeToChangelogFile: true
+            splitStatements: false
+            stripComments: true
+      rollback:
+        - sqlFile:
+            path: migrations/down/005.sql
+            relativeToChangelogFile: true
+            splitStatements: false
+            stripComments: true
